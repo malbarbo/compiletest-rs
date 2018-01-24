@@ -49,7 +49,7 @@ pub fn dylib_env_var() -> &'static str {
 pub fn run(config: Config, testpaths: &TestPaths) {
     match &*config.target {
 
-        "arm-linux-androideabi" | "armv7-linux-androideabi" | "aarch64-linux-android" => {
+        "arm-linux-xandroideabi" | "armv7-linux-xandroideabi" | "aarch64-linux-xandroid" => {
             if !config.adb_device_status {
                 panic!("android device not available");
             }
@@ -457,9 +457,9 @@ actual:\n\
 
         let debugger_run_result;
         match &*self.config.target {
-            "arm-linux-androideabi" |
-            "armv7-linux-androideabi" |
-            "aarch64-linux-android" => {
+            "arm-linux-xandroideabi" |
+            "armv7-linux-xandroideabi" |
+            "aarch64-linux-xandroid" => {
 
                 cmds = cmds.replace("run", "continue");
 
