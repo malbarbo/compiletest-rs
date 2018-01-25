@@ -16,7 +16,7 @@ name = "compiletest_rs"
 
 [dependencies]
 diff = "0.1.10"
-filetime = "0.1"
+filetime = { git = "https://github.com/malbarbo/filetime", branch = "x32"}
 getopts = "0.2"
 log = "0.4"
 tempdir = { version = "0.3", optional = true }
