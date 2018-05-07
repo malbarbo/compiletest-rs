@@ -8,3 +8,6 @@ authors = ["Thomas Jespersen <laumann.thomas@gmail.com>"]
 [dev-dependencies.compiletest_rs]
 path = ".."
 features = ["tmp"]
+
+[features]
+stable = ["compiletest_rs/stable"]

@@ -263,6 +263,12 @@ impl<'test> TestCx<'test> {
         }
     }
 
+    #[cfg(feature = "stable")]
+    fn run_pretty_test(&self) {
+        self.fatal("pretty-printing tests can only be used with nightly Rust".into());
+    }
+
+    #[cfg(not(feature = "stable"))]
     fn run_pretty_test(&self) {
         if self.props.pp_exact.is_some() {
             logv(self.config, "testing for exact pretty-printing".to_owned());
@@ -344,8 +350,7 @@ impl<'test> TestCx<'test> {
 
         let mut rustc = Command::new(&self.config.rustc_path);
         rustc.arg("-")
-            .arg("-Zunstable-options")
-            .args(&["--unpretty", &pretty_type])
+            .args(&["-Z", &format!("unpretty={}", pretty_type)])
             .args(&["--target", &self.config.target])
             .arg("-L").arg(&aux_dir)
             .args(self.split_maybe_args(&self.config.target_rustcflags))
@@ -2619,7 +2624,11 @@ fn read2_abbreviated(mut child: Child) -> io::Result<Output> {
                     *skipped += data.len();
                     if data.len() <= TAIL_LEN {
                         tail[..data.len()].copy_from_slice(data);
+                        #[cfg(not(feature = "stable"))]
                         tail.rotate_left(data.len());
+                        // FIXME: Remove this when rotate_left is stable in 1.26
+                        #[cfg(feature = "stable")]
+                        rotate_left(tail, data.len());
                     } else {
                         tail.copy_from_slice(&data[(data.len() - TAIL_LEN)..]);
                     }
@@ -2656,4 +2665,16 @@ fn read2_abbreviated(mut child: Child) -> io::Result<Output> {
         stdout: stdout.into_bytes(),
         stderr: stderr.into_bytes(),
     })
+}
+
+// FIXME: Remove this when rotate_left is stable in 1.26
+#[cfg(feature = "stable")]
+fn rotate_left<T>(slice: &mut [T], places: usize) {
+    // Rotation can be implemented by reversing the slice,
+    // splitting the slice in two, and then reversing the
+    // two sub-slices.
+    slice.reverse();
+    let (a, b) = slice.split_at_mut(places);
+    a.reverse();
+    b.reverse();
 }
